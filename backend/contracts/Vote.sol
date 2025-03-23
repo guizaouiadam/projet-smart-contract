@@ -44,9 +44,11 @@ contract Voting is Ownable {
     WorkflowStatus public workflowStatus;
 
     event VoterRegistered(address voterAddress);
+    event VoterRemoved(address voterAddress);
     event WorkflowStatusChange(WorkflowStatus previousStatus, WorkflowStatus newStatus);
     event ProposalRegistered(uint proposalId);
     event ProposalWithdrawn(uint proposalId);
+    event ProposalRemoved(uint proposalId);
     event Voted(address voter, uint proposalId);
     event VoteDelegated(address from, address to);
 
@@ -78,6 +80,18 @@ contract Voting is Ownable {
 
         voters[_voter].isRegistered = true;
         emit VoterRegistered(_voter);
+    }
+
+    /**
+     * @dev Removes a voter by the owner.
+     * @param _voter The address of the voter to be removed.
+     */
+    function removeVoter(address _voter) external onlyOwner {
+        require(workflowStatus == WorkflowStatus.RegisteringVoters, "Workflow status not Registering voters");
+        require(voters[_voter].isRegistered, "Voter is not registered");
+
+        delete voters[_voter];
+        emit VoterRemoved(_voter);
     }
 
     /**
@@ -123,6 +137,21 @@ contract Voting is Ownable {
 
         proposal.description = "";
         emit ProposalWithdrawn(_proposalId);
+    }
+
+    /**
+     * @dev Removes a proposal by the owner.
+     * @param _proposalId The ID of the proposal to be removed.
+     */
+    function removeProposal(uint _proposalId) external onlyOwner {
+        require(workflowStatus == WorkflowStatus.ProposalsRegistrationStarted, "Proposals registration is not open");
+        require(_proposalId < proposals.length, "Invalid proposal ID");
+
+        Proposal storage proposal = proposals[_proposalId];
+        require(keccak256(abi.encodePacked(proposal.description)) != keccak256(abi.encodePacked("")), "Proposal already removed");
+
+        proposal.description = "";
+        emit ProposalRemoved(_proposalId);
     }
 
     /**
