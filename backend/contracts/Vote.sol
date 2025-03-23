@@ -81,6 +81,14 @@ contract Voting is Ownable {
     }
 
     /**
+     * @dev Starts the voter registration phase.
+     */
+    function startVoterRegistration() external onlyOwner {
+        workflowStatus = WorkflowStatus.RegisteringVoters;
+        emit WorkflowStatusChange(workflowStatus, WorkflowStatus.RegisteringVoters);
+    }
+
+    /**
      * @dev Starts the proposal registration phase.
      */
     function startProposalsRegistration() external onlyOwner {
@@ -184,4 +192,13 @@ contract Voting is Ownable {
         require(workflowStatus == WorkflowStatus.VotesTallied, "Votes have not been tallied yet");
         return proposals[winningProposalId].description;
     }
+
+    /**
+     * @dev Returns the current workflow status.
+     * @return The current workflow status.
+     */
+    function getWorkflowStatus() external view returns (WorkflowStatus) {
+        return workflowStatus;
+    }
+
 }
