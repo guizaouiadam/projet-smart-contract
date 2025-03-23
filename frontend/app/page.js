@@ -612,7 +612,9 @@ export default function Home() {
         abi: contractABI,
         functionName: "getWinner",
       });
-      setWinner(winnerDescription);
+
+      console.log("Winner description:", winnerDescription.description || winnerDescription); // Log the entire response
+      setWinner(winnerDescription.description || winnerDescription);
     } catch (error) {
       console.error("Error getting winner:", error);
     }
@@ -799,6 +801,7 @@ export default function Home() {
 
       // Update the list of registered proposals
       setProposals(proposals.filter((_, index) => index !== parseInt(selectedProposalId)));
+      setSelectedProposalId(null); // Reset the selected proposal ID
     } catch (error) {
       console.error("Error removing proposal:", error);
     }
